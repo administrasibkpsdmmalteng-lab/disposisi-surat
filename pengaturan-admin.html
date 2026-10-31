@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="sidebar.css">
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-brand">
+  <img src="logo-bkpsdm.png" alt="Logo BKPSDM" style="width:75px;height:75px;object-fit:contain;margin-bottom:8px;filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));">
+  <h5>BKPSDM</h5><p>Kab. Maluku Tengah</p>
+  <div class="mt-2"><span id="whoLogin" class="badge bg-white text-primary" style="font-size:10px"></span></div>
+</div>
+<ul class="sidebar-menu">
+<li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+<li><a href="surat-masuk.html"><i class="fas fa-envelope"></i> Surat Masuk</a></li>
+<li><a href="disposisi-kepala.html"><i class="fas fa-file-signature"></i> Disposisi Kepala</a></li>
+<li><a href="disposisi-bidang.html"><i class="fas fa-envelope-open-text"></i> Disposisi Bidang</a></li>
+<li><a href="arsip.html"><i class="fas fa-archive"></i> Arsip</a></li>
+<li><a href="pengaturan-admin.html" class="active"><i class="fas fa-cog"></i> Pengaturan Admin</a></li>
+<li><a href="#" onclick="keluar()"><i class="fas fa-sign-out-alt"></i> Keluar</a></li>
+</ul>
+</div>
+
+<div class="main-content">
+<h4 class="mb-1"><i class="fas fa-cog me-2 text-primary"></i> Pengaturan Admin</h4>
+<p class="text-muted small mb-4">Hanya role <strong>Admin</strong> yang bisa membuka halaman ini. Kepala Badan: <strong id="namaKepalaTop"></strong></p>
+
+<div class="row">
+<!-- KIRI -->
+<div class="col-lg-6">
+<div class="card">
+<div class="card-header bg-primary text-white"><i class="fas fa-user-cog me-2"></i> Kelola User Login</div>
+<div class="card-body">
+<div class="mb-2"><label class="small">Username</label><input type="text" id="newUsername" class="form-control" placeholder="contoh: kabid_mutasi"></div>
+<div class="mb-2"><label class="small">Nama Lengkap</label><input type="text" id="newNama" class="form-control" placeholder="contoh: Kabid Mutasi & Promosi"></div>
+<div class="mb-2"><label class="small">Password</label><input type="text" id="newPass" class="form-control" placeholder="contoh: Bkpsdm2026!"></div>
+<div class="mb-3"><label class="small">Role</label><select id="newRole" class="form-select"><option value="admin">Admin</option><option value="kepala">Kepala Badan</option><option value="bidang">Bidang / Sekretariat</option></select></div>
+<button class="btn btn-success w-100" onclick="tambahUser()"><i class="fas fa-plus me-2"></i> Tambah User</button>
+<hr>
+<div class="table-responsive">
+<table class="table table-sm align-middle">
+<thead class="table-light"><tr><th>Username</th><th>Role</th><th>Aksi</th></tr></thead>
+<tbody id="tbodyUser"></tbody>
+</table>
+</div>
+<small class="text-muted">Akun default: admin/admin123, kepala/kepala123, bidang/bidang123</small>
+</div>
+</div>
+
+<div class="card">
+<div class="card-header"><i class="fas fa-database me-2"></i> Backup, Restore & Reset</div>
+<div class="card-body">
+<button class="btn btn-outline-primary w-100 mb-2" onclick="backupData()"><i class="fas fa-download me-2"></i> Backup Semua Data (JSON)</button>
+<input type="file" id="fileRestore" class="form-control mb-2" accept=".json">
+<button class="btn btn-outline-warning w-100 mb-3" onclick="restoreData()"><i class="fas fa-upload me-2"></i> Restore Data</button>
+<hr>
+<label class="small fw-bold text-danger">Zona Berbahaya - Reset Data</label>
+<button class="btn btn-outline-danger w-100 mb-2" onclick="resetKey('daftarSuratMasuk')">Reset Surat Masuk</button>
+<button class="btn btn-outline-danger w-100 mb-2" onclick="resetKey('daftarDisposisiBidang');resetKey('disposisiMasuk');resetKey('notifikasiDisposisi');resetKey('lastDisposisiCount')">Reset Semua Disposisi & Notifikasi</button>
+<button class="btn btn-outline-danger w-100" onclick="resetKey('arsipDigital')">Reset Arsip Digital</button>
+</div>
+</div>
+</div>
+
+<!-- KANAN -->
+<div class="col-lg-6">
+<div class="card">
+<div class="card-header bg-success text-white"><i class="fas fa-signature me-2"></i> Identitas Kepala Badan</div>
+<div class="card-body">
+<div class="mb-3"><label class="form-label small">Nama Kepala</label><input type="text" id="setNamaKepala" class="form-control" value="Sah Alim Latuconsina, S.STP.,M.Si"></div>
+<div class="mb-3"><label class="form-label small">NIP Kepala</label><input type="text" id="setNipKepala" class="form-control" value="NIP. 198005151999121001"></div>
+<div class="mb-3"><label class="form-label small">Tanda Tangan Digital Saat Ini</label><div id="previewTTD" class="border p-3 text-center bg-light rounded" style="min-height:90px"></div></div>
+<div class="mb-3"><button class="btn btn-danger btn-sm" onclick="hapusTTDAdmin()"><i class="fas fa-trash me-1"></i> Hapus TTD</button> <small class="text-muted ms-2">TTD dibuat di halaman Disposisi Kepala</small></div>
+<button class="btn btn-success w-100" onclick="simpanIdentitas()"><i class="fas fa-save me-2"></i> Simpan Identitas</button>
+</div>
+</div>
+
+<div class="card">
+<div class="card-header bg-success text-white"><i class="fab fa-whatsapp me-2"></i> WA Gateway - Notifikasi Otomatis ke Kabid</div>
+<div class="card-body">
+<div class="form-check form-switch mb-3"><input class="form-check-input" type="checkbox" id="waAktif"><label class="form-check-label" for="waAktif">Aktifkan Kirim WA Otomatis Saat Disposisi Baru</label></div>
+<div class="mb-2"><label class="small">Provider WA</label><select id="waProvider" class="form-select form-select-sm"><option value="fonnte">Fonnte.com (Rekomendasi)</option><option value="wablas">Wablas.com</option></select></div>
+<div class="mb-3"><label class="small">Token API</label><input type="text" id="waToken" class="form-control form-control-sm" placeholder="Paste token dari fonnte.com"><small class="text-muted">Cara: Daftar fonnte.com → Scan QR WA kantor → Copy token</small></div>
+<hr>
+<label class="small fw-bold mb-2">Nomor WA Tiap Bidang (format wajib 62812xxxxxxx)</label>
+<div id="waNomorList"></div>
+<button class="btn btn-success btn-sm w-100 mt-3" onclick="simpanWASettings()"><i class="fas fa-save me-1"></i> Simpan Setting WA</button>
+<hr>
+<div class="mb-2"><label class="small">Test Kirim WA</label><input type="text" id="testNomor" class="form-control form-control-sm" placeholder="62812xxxx untuk test"></div>
+<button class="btn btn-outline-success btn-sm w-100" onclick="testWA()"><i class="fab fa-whatsapp me-1"></i> Test Kirim Pesan</button>
+<small class="text-muted d-block mt-2">Jika token benar, WA test akan masuk ke nomor di atas.</small>
+</div>
+</div>
+
+<div class="card">
+<div class="card-header"><i class="fas fa-info-circle me-2"></i> Info Sistem</div>
+<div class="card-body small">
+<p class="mb-2"><strong>Versi:</strong> E-Disposisi BKPSDM v2.1<br><strong>Mode:</strong> Offline LocalStorage + WA Gateway<br><strong>Kepala:</strong> Sah Alim Latuconsina, S.STP.,M.Si</p>
+<ul id="infoStat" class="mb-0"></ul>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+function cekAdmin(){ const role=localStorage.getItem('peranPengguna'); if(role!=='admin'){ alert('Hanya Admin yang bisa buka Pengaturan! Anda login sebagai '+role); location.href='login.html'; } }
+function getUsers(){ return JSON.parse(localStorage.getItem('daftarUser')||'[]'); }
+function renderUser(){ const tb=document.getElementById('tbodyUser'); const users=getUsers(); if(users.length===0){ tb.innerHTML='<tr><td colspan="3" class="text-center text-muted">Belum ada user</td></tr>'; return; } tb.innerHTML=users.map((u,i)=>`<tr><td><strong>${u.username}</strong><br><small>${u.nama}</small></td><td><span class="badge bg-primary">${u.role}</span></td><td><button class="btn btn-sm btn-danger" onclick="hapusUser(${i})"><i class="fas fa-trash"></i></button></td></tr>`).join(''); }
+function tambahUser(){ const u=document.getElementById('newUsername').value.trim(); const n=document.getElementById('newNama').value.trim(); const p=document.getElementById('newPass').value.trim(); const r=document.getElementById('newRole').value; if(!u||!n||!p){ alert('Lengkapi username, nama, password!'); return; } let users=getUsers(); if(users.find(x=>x.username===u)){ alert('Username sudah ada!'); return; } users.push({username:u, nama:n, password:p, role:r}); localStorage.setItem('daftarUser', JSON.stringify(users)); document.getElementById('newUsername').value=''; document.getElementById('newNama').value=''; document.getElementById('newPass').value=''; renderUser(); alert('User '+u+' berhasil ditambah!'); }
+function hapusUser(i){ if(!confirm('Hapus user ini?')) return; let users=getUsers(); if(users.length===1){ alert('Tidak bisa hapus user terakhir!'); return; } users.splice(i,1); localStorage.setItem('daftarUser', JSON.stringify(users)); renderUser(); }
+function simpanIdentitas(){ const nama=document.getElementById('setNamaKepala').value.trim(); const nip=document.getElementById('setNipKepala').value.trim(); if(!nama){ alert('Nama tidak boleh kosong'); return; } localStorage.setItem('namaKepalaBKPSDM', nama); localStorage.setItem('nipKepalaBKPSDM', nip); localStorage.setItem('namaKepala', nama); document.getElementById('namaKepalaTop').textContent=nama; alert('Identitas disimpan! Nama sekarang: '+nama); }
+function hapusTTDAdmin(){ if(!confirm('Hapus Tanda Tangan Kepala? TTD harus dibuat ulang di Disposisi Kepala.')) return; localStorage.removeItem('ttdKepala'); document.getElementById('previewTTD').innerHTML='<span class="text-muted small">Tidak ada TTD - Buat di halaman Disposisi Kepala</span>'; alert('TTD dihapus'); }
+function backupData(){ const keys=['daftarSuratMasuk','daftarDisposisiBidang','disposisiMasuk','arsipDigital','daftarUser','namaKepalaBKPSDM','nipKepalaBKPSDM','ttdKepala','waSettings','notifikasiDisposisi']; const data={}; keys.forEach(k=>{ const v=localStorage.getItem(k); if(v) data[k]=v; }); const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='backup-bkpsdm-'+new Date().toISOString().slice(0,10)+'.json'; a.click(); URL.revokeObjectURL(url); }
+function restoreData(){ const file=document.getElementById('fileRestore').files[0]; if(!file){ alert('Pilih file backup .json dulu!'); return; } const reader=new FileReader(); reader.onload=function(e){ try{ const d=JSON.parse(e.target.result); let count=0; Object.keys(d).forEach(k=>{ localStorage.setItem(k, d[k]); count++; }); alert('Restore berhasil! '+count+' data dipulihkan.'); location.reload(); }catch(err){ alert('File rusak / bukan JSON backup!'); } }; reader.readAsText(file); }
+function resetKey(k){ if(!confirm('Yakin reset '+k+'? Data akan hilang permanen!')) return; localStorage.removeItem(k); if(k.includes('Disposisi')){ localStorage.removeItem('lastDisposisiCount'); } alert(k+' berhasil direset!'); location.reload(); }
+function keluar(){ if(confirm('Keluar dari Admin?')){ localStorage.removeItem('peranPengguna'); location.href='login.html'; } }
+
+// WA GATEWAY SETTINGS
+function loadWASettingsUI(){
+  const def={"aktif":false,"provider":"fonnte","token":"","nomorBidang":{"Sekretaris":"","Kabid Mutasi & Promosi":"","Kabid Pengadaan, Pemberhentian & Informasi":"","Kabid Penilaian Kinerja Aparatur & Penghargaan":"","Kabid Pengembangan Aparatur":""}};
+  let s; try{ s=JSON.parse(localStorage.getItem('waSettings')||JSON.stringify(def)); }catch(e){ s=def; }
+  if(!s.nomorBidang) s.nomorBidang=def.nomorBidang;
+  document.getElementById('waAktif').checked=!!s.aktif;
+  document.getElementById('waProvider').value=s.provider||'fonnte';
+  document.getElementById('waToken').value=s.token||'';
+  const bidangs=["Sekretaris","Kabid Mutasi & Promosi","Kabid Pengadaan, Pemberhentian & Informasi","Kabid Penilaian Kinerja Aparatur & Penghargaan","Kabid Pengembangan Aparatur"];
+  document.getElementById('waNomorList').innerHTML=bidangs.map(b=>`<div class="mb-2"><label class="small">${b}</label><input type="text" class="form-control form-control-sm wa-nomor" data-bidang="${b}" value="${(s.nomorBidang[b]||'').replace(/[^0-9]/g,'')}" placeholder="62812xxxxxxx"></div>`).join('');
+}
+function simpanWASettings(){
+  const nomorBidang={}; document.querySelectorAll('.wa-nomor').forEach(el=>{ nomorBidang[el.dataset.bidang]=el.value.trim(); });
+  const settings={ aktif: document.getElementById('waAktif').checked, provider: document.getElementById('waProvider').value, token: document.getElementById('waToken').value.trim(), nomorBidang };
+  localStorage.setItem('waSettings', JSON.stringify(settings));
+  alert('Setting WA disimpan! Aktif: '+(settings.aktif?'YA':'TIDAK'));
+}
+async function testWA(){
+  const nomor=document.getElementById('testNomor').value.trim();
+  if(!nomor){ alert('Isi nomor WA test dulu! Format 62812xxxx'); return; }
+  const settings=JSON.parse(localStorage.getItem('waSettings')||'{}');
+  if(!settings.token){ alert('Isi Token WA dulu di atas! Daftar di fonnte.com'); return; }
+  const pesan=`🔔 *TEST WA GATEWAY - BKPSDM MALUKU TENGAH*\n\nIni adalah pesan test dari sistem E-Disposisi.\nJika kamu menerima pesan ini, berarti setting WA sudah benar!\n\nWaktu: ${new Date().toLocaleString('id-ID')}\nKepala: Sah Alim Latuconsina, S.STP.,M.Si`;
+  try{
+    let res; if(settings.provider==='fonnte'){ res=await fetch('https://api.fonnte.com/send',{method:'POST',headers:{'Authorization':settings.token,'Content-Type':'application/json'},body:JSON.stringify({target:nomor,message:pesan,countryCode:'62'})}); }
+    else { res=await fetch('https://wablas.com/api/send-message',{method:'POST',headers:{'Authorization':settings.token,'Content-Type':'application/json'},body:JSON.stringify({phone:nomor,message:pesan})}); }
+    const txt=await res.text(); alert('Request terkirim! Respon: '+txt.substring(0,200)); console.log(txt);
+  }catch(e){ alert('Gagal kirim! Cek token & koneksi internet. Error: '+e.message); }
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  cekAdmin();
+  renderUser();
+  loadWASettingsUI();
+  const nama=localStorage.getItem('namaKepalaBKPSDM')||'Sah Alim Latuconsina, S.STP.,M.Si';
+  const nip=localStorage.getItem('nipKepalaBKPSDM')||'NIP. 198005151999121001';
+  document.getElementById('setNamaKepala').value=nama;
+  document.getElementById('setNipKepala').value=nip;
+  document.getElementById('namaKepalaTop').textContent=nama;
+  const ttd=localStorage.getItem('ttdKepala');
+  document.getElementById('previewTTD').innerHTML= ttd? `<img src="${ttd}" style="max-height:80px;max-width:100%">` : '<span class="text-muted small">Belum ada TTD<br>Buat di halaman Disposisi Kepala → tombol TTD</span>';
+  const surat=JSON.parse(localStorage.getItem('daftarSuratMasuk')||'[]').length;
+  const disp=(JSON.parse(localStorage.getItem('daftarDisposisiBidang')||'[]').length + JSON.parse(localStorage.getItem('disposisiMasuk')||'[]').length);
+  const arsip=JSON.parse(localStorage.getItem('arsipDigital')||'[]').length;
+  const user=JSON.parse(localStorage.getItem('daftarUser')||'[]').length;
+  document.getElementById('infoStat').innerHTML=`<li>Surat Masuk: ${surat} data</li><li>Disposisi: ${disp} data</li><li>Arsip: ${arsip} data</li><li>User Login: ${user} user</li>`;
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

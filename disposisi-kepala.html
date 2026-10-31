@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lembar Disposisi — BKPSDM Maluku Tengah</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --biru-tua: #0d47a1; --biru: #1565c0; }
+        body { background: #f5f7fa; font-family: 'Segoe UI', sans-serif; }
+        .sidebar { background: linear-gradient(180deg, #0d47a1 0%, #1565c0 100%); min-height: 100vh; position: fixed; top: 0; left: 0; width: 260px; z-index: 100; }
+        .sidebar-brand { padding: 1.5rem 1rem; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-brand h5 { color: white; font-weight: 700; margin-bottom: 0; }
+        .sidebar-brand p { color: #bbdefb; font-size: 0.8rem; }
+        .sidebar-menu { list-style: none; padding: 1rem; margin: 0; }
+        .sidebar-menu li { margin: 0.4rem 0; }
+        .sidebar-menu a { display: flex; align-items: center; padding: 0.85rem 1rem; color: #e3f2fd; text-decoration: none; border-radius: 8px; }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background: rgba(255,255,255,0.15); color: white; }
+        .sidebar-menu a i { margin-right: 0.75rem; width: 20px; text-align: center; }
+        .main-content { margin-left: 260px; padding: 2rem; }
+        .disposisi-container { background: white; border: 2px solid #333; max-width: 850px; margin: 0 auto; }
+        .disposisi-header { text-align: center; padding: 1rem; border-bottom: 2px solid #333; }
+        .disposisi-title { background: #6c757d; color: white; font-weight: bold; text-align: center; padding: 0.4rem; border: 1px solid #333; }
+        .disposisi-row { display: flex; flex-wrap: wrap; border-bottom: 1px solid #333; }
+        .disposisi-col { padding: 0.5rem; border-right: 1px solid #333; }
+        .label-col { width: 120px; font-weight: 600; }
+        .value-col { flex: 1; min-width: 200px; }
+        .text-line { border: none; border-bottom: 1px dotted #333; outline: none; width: 100%; padding: 0 0.3rem; background: transparent; }
+        .ttd-area { text-align: right; padding: 1rem 2rem; }
+        .ttd-canvas-wrap { border: 1px dashed #333; background: #fffef0; width: 300px; height: 150px; margin-left: auto; position: relative; }
+        #canvasTTD { width: 100%; height: 100%; cursor: crosshair; touch-action: none; }
+        @media print { .sidebar, .btn-action, .main-content > h4, .ttd-tools { display: none !important; } .main-content{margin:0!important;padding:0!important} }
+    </style>
+</head>
+<body>
+<div class="sidebar">
+    <div class="sidebar-brand">
+  <img src="logo-bkpsdm.png" alt="Logo BKPSDM" style="width:75px;height:75px;object-fit:contain;margin-bottom:8px;filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));">
+  <h5>BKPSDM</h5><p>Kab. Maluku Tengah</p>
+  <div class="mt-2"><span id="whoLogin" class="badge bg-white text-primary" style="font-size:10px"></span></div>
+</div>
+    <ul class="sidebar-menu">
+        <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="surat-masuk.html"><i class="fas fa-envelope"></i> Surat Masuk</a></li>
+        <li><a href="disposisi-kepala.html" class="active"><i class="fas fa-file-signature"></i> Lembar Disposisi</a></li>
+        <li><a href="disposisi-bidang.html"><i class="fas fa-envelope-open-text"></i> Disposisi Masuk</a></li>
+        <li><a href="arsip.html"><i class="fas fa-archive"></i> Arsip Digital</a></li>
+        <li><a href="#" onclick="keluarSistem()"><i class="fas fa-sign-out-alt"></i> Keluar</a></li>
+    </ul>
+</div>
+
+<div class="main-content">
+    <h4 class="mb-4 text-center"><i class="fas fa-file-signature me-2 text-primary"></i> Lembar Disposisi Surat</h4>
+    <div class="alert alert-warning small py-2" id="infoFile">Memuat file surat...</div>
+    <div class="disposisi-container" id="areaCetak">
+        <div class="disposisi-header" style="display:flex;align-items:center;gap:15px;text-align:left">
+  <img src="logo-bkpsdm.png" style="width:75px;height:75px;object-fit:contain;">
+  <div style="text-align:center;flex:1">
+    <h4 style="margin:0">PEMERINTAH KABUPATEN MALUKU TENGAH</h4>
+    <h4 style="margin:0">BADAN KEPEGAWAIAN DAN PENGEMBANGAN SUMBER DAYA MANUSIA</h4>
+    <p style="margin:0">Jl. Geser No. 4 Telp. (0914) 22402 Kode Pos. 97511 — MASOHI</p>
+  </div>
+</div>
+        <div class="disposisi-title">LEMBAR DISPOSISI</div>
+        <div class="disposisi-row"><div class="disposisi-col label-col">Surat Dari :</div><div class="disposisi-col value-col"><input type="text" id="suratDari" class="text-line"></div></div>
+        <div class="disposisi-row"><div class="disposisi-col label-col">Perihal :</div><div class="disposisi-col value-col"><input type="text" id="perihal" class="text-line"></div></div>
+        <div class="disposisi-row"><div class="disposisi-col label-col">Nomor Surat :</div><div class="disposisi-col" style="width:28%"><input type="text" id="nomorSurat" class="text-line"></div><div class="disposisi-col label-col" style="width:130px">Tanggal Surat :</div><div class="disposisi-col" style="width:25%"><input type="date" id="tanggalSurat" class="text-line"></div></div>
+        <div class="disposisi-row"><div class="disposisi-col label-col">Nomor Agenda :</div><div class="disposisi-col" style="width:28%"><input type="text" id="nomorAgenda" class="text-line"></div><div class="disposisi-col label-col" style="width:130px">Tanggal Terima:</div><div class="disposisi-col" style="width:25%"><input type="date" id="tanggalTerima" class="text-line"></div></div>
+        
+        <div class="disposisi-row">
+            <div class="disposisi-col" style="width:32%; border-right:1px solid #333"><div class="disposisi-title" style="font-size:.85rem">SIFAT SURAT</div><div class="p-2"><div class="form-check"><input class="form-check-input" type="checkbox" id="sifatUmum" value="Umum"><label class="form-check-label" for="sifatUmum">Umum</label></div><div class="form-check"><input class="form-check-input" type="checkbox" id="sifatRahasia" value="Rahasia"><label class="form-check-label" for="sifatRahasia">Rahasia</label></div></div></div>
+            <div class="disposisi-col" style="width:35%; border-right:1px solid #333"><div class="disposisi-title" style="font-size:.85rem">URGENSI</div><div class="p-2"><div class="form-check"><input class="form-check-input" type="checkbox" id="urgensiBiasa" value="Biasa"><label class="form-check-label">Biasa</label></div><div class="form-check"><input class="form-check-input" type="checkbox" id="urgensiPenting" value="Penting"><label class="form-check-label">Penting</label></div><div class="form-check"><input class="form-check-input" type="checkbox" id="urgensiSangatPenting" value="Sangat Penting"><label class="form-check-label">Sangat Penting</label></div></div></div>
+            <div class="disposisi-col" style="width:33%"><div class="p-2 pt-4"><div class="form-check"><input class="form-check-input" type="checkbox" id="segera" value="Segera"><label class="form-check-label">Segera</label></div><div class="form-check"><input class="form-check-input" type="checkbox" id="amatSegera" value="Amat Segera"><label class="form-check-label">Amat Segera</label></div></div></div>
+        </div>
+
+        <div class="disposisi-row" style="border-bottom:none">
+            <div class="disposisi-col" style="width:50%; border-right:1px solid #333; border-bottom:1px solid #333"><div class="disposisi-title" style="font-size:.85rem">DISPOSISI KEPADA (PRIVATE)</div><div class="p-2"><div class="form-check"><input class="form-check-input" type="checkbox" id="tujuanSekretaris" value="Sekretaris"><label class="form-check-label">Sekretaris — akun sekretaris</label></div><div class="form-check"><input class="form-check-input" type="checkbox" id="tujuanMutasiPromosi" value="Kabid Mutasi & Promosi"><label class="form-check-label">Kabid Mutasi — kabid_mutasi</label></div><div class="form-check"><input class="form-check-input" type="checkbox" id="tujuanPengadaan" value="Kabid Pengadaan, Pemberhentian & Informasi"><label class="form-check-label">Kabid Pengadaan — kabid_pengadaan</label></div><div class="form-check"><input class="form-check-input" type="checkbox" id="tujuanPenilaianKinerja" value="Kabid Penilaian Kinerja Aparatur & Penghargaan"><label class="form-check-label">Kabid Kinerja — kabid_kinerja</label></div><div class="form-check"><input class="form-check-input" type="checkbox" id="tujuanPengembanganAparatur" value="Kabid Pengembangan Aparatur"><label class="form-check-label">Kabid Pengembangan — kabid_pengembangan</label></div></div></div>
+            <div class="disposisi-col" style="width:50%; border-bottom:1px solid #333"><div class="disposisi-title" style="font-size:.85rem">Untuk Di</div><div class="p-2"><div class="form-check"><input class="form-check-input" type="checkbox" id="untukDipelajari" value="Pelajari"><label class="form-check-label">Pelajari</label></div><div class="form-check"><input class="form-check-input" type="checkbox" id="untukDanggapi" value="Tanggapi"><label class="form-check-label">Tanggapi</label></div><div class="form-check"><input class="form-check-input" type="checkbox" id="untukTindakLanjuti" value="Tindak Lanjuti"><label class="form-check-label">Tindak Lanjuti</label></div><div class="form-check"><input class="form-check-input" type="checkbox" id="untukKetahuiArsip" value="Ketahui/Arsip"><label class="form-check-label">Ketahui / Arsip</label></div><div class="form-check"><input class="form-check-input" type="checkbox" id="untukBicarakan" value="Bicarakan dengan Saya"><label class="form-check-label">Bicarakan dengan saya</label></div></div></div>
+        </div>
+
+        <div class="disposisi-row" style="border-bottom:none; min-height:180px"><div class="disposisi-col label-col">Catatan :</div><div class="disposisi-col value-col"><textarea id="catatan" style="width:100%;height:120px;border:none;outline:none;resize:none" placeholder="Tulis catatan..."></textarea></div></div>
+
+        <div class="ttd-area">
+            <p>Masohi, <input type="text" id="tglTTD" style="width:130px;border:none;border-bottom:1px solid #333;text-align:center"> 2026</p>
+            <p>Kepala Badan,</p>
+            <div class="ttd-canvas-wrap mt-2 mb-1">
+                <canvas id="canvasTTD" width="300" height="150"></canvas>
+                <img id="hasilTTD" style="display:none; width:100%; height:100%; object-fit:contain;">
+            </div>
+            <div class="ttd-tools mb-3">
+                <button class="btn btn-sm btn-outline-danger" onclick="hapusTTD()"><i class="fas fa-eraser"></i> Hapus TTD</button>
+                <button class="btn btn-sm btn-success" onclick="simpanTTD()"><i class="fas fa-check"></i> Simpan TTD</button>
+                <small class="text-muted ms-2">Coret di kotak kuning</small>
+            </div>
+            <p style="margin-bottom:0"><input type="text" id="namaKepala" value="Sah Alim Latuconsina, S.STP.,M.Si" style="border:none;border-bottom:1px solid #333;text-align:right;font-weight:bold;text-decoration:underline;width:320px"></p>
+            <p style="margin:0;font-size:.85rem"><input type="text" id="nipKepala" value="NIP. 198005151999121001" style="border:none;text-align:right;font-size:.85rem;width:250px"></p>
+        </div>
+    </div>
+
+    <div class="btn-action text-center mt-4">
+        <button class="btn btn-success" onclick="simpanDisposisi()"><i class="fas fa-save me-2"></i> Simpan</button>
+        <button class="btn btn-primary" id="btnKirimBidang" onclick="kirimKeBidang()"><i class="fas fa-paper-plane me-2"></i> Kirim ke Bidang + WA (ONLINE)</button>
+        <button class="btn btn-secondary" onclick="window.print()"><i class="fas fa-print me-2"></i> Cetak</button>
+        <button class="btn btn-outline-secondary" onclick="resetForm()"><i class="fas fa-redo me-2"></i> Kosongkan</button>
+    </div>
+</div>
+
+<script type="module">
+// ===== FIREBASE CONFIG GABUNG - OPSI B TANPA STORAGE =====
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD5JJzznHpSzMyvocaBFu9QuyeA7OSRHT4",
+  authDomain: "bkpsdm-malteng.firebaseapp.com",
+  projectId: "bkpsdm-malteng",
+  storageBucket: "bkpsdm-malteng.firebasestorage.app",
+  messagingSenderId: "82335203567",
+  appId: "1:82335203567:web:80da48f1db741e9045db1a",
+  measurementId: "G-FLCGL08CTT"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ===== KODE ASLI KAMU TETAP - HANYA DIPERBAIKI KIRIM ONLINE =====
+let ttdData = localStorage.getItem('ttdKepala') || null;
+let fileSuratGlobal = null;
+let fileNameGlobal = '';
+const canvas = document.getElementById('canvasTTD');
+const ctx = canvas.getContext('2d');
+let isDrawing = false;
+
+function initCanvas(){
+    ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#000';
+    canvas.addEventListener('mousedown', e=>{ isDrawing=true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); });
+    canvas.addEventListener('mousemove', e=>{ if(!isDrawing) return; ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); });
+    canvas.addEventListener('mouseup', ()=> isDrawing=false);
+    canvas.addEventListener('touchstart', e=>{ const r=canvas.getBoundingClientRect(); const t=e.touches[0]; isDrawing=true; ctx.beginPath(); ctx.moveTo(t.clientX-r.left, t.clientY-r.top); e.preventDefault(); }, {passive:false});
+    canvas.addEventListener('touchmove', e=>{ if(!isDrawing) return; const r=canvas.getBoundingClientRect(); const t=e.touches[0]; ctx.lineTo(t.clientX-r.left, t.clientY-r.top); ctx.stroke(); e.preventDefault(); }, {passive:false});
+    canvas.addEventListener('touchend', ()=> isDrawing=false);
+    if(ttdData){ const img=document.getElementById('hasilTTD'); img.src=ttdData; img.style.display='block'; canvas.style.display='none'; }
+}
+window.hapusTTD = function(){ ctx.clearRect(0,0,canvas.width,canvas.height); document.getElementById('hasilTTD').style.display='none'; canvas.style.display='block'; ttdData=null; localStorage.removeItem('ttdKepala'); }
+window.simpanTTD = function(){ if(canvas.style.display==='none' && ttdData){ alert('TTD sudah tersimpan'); return; } const isEmpty = ctx.getImageData(0,0,canvas.width,canvas.height).data.every((v,i)=> i%4===3 ? true : v===0); if(isEmpty && !ttdData){ alert('Coret dulu tanda tangannya!'); return; } ttdData = canvas.toDataURL(); localStorage.setItem('ttdKepala', ttdData); alert('Tanda tangan disimpan!'); const img=document.getElementById('hasilTTD'); img.src=ttdData; img.style.display='block'; canvas.style.display='none'; }
+window.getChecked = function(ids){ return ids.filter(id=>document.getElementById(id)?.checked).map(id=>document.getElementById(id).value); }
+window.getFormData = function(){
+    return {
+        suratDari: document.getElementById('suratDari').value, perihal: document.getElementById('perihal').value,
+        nomorSurat: document.getElementById('nomorSurat').value, tanggalSurat: document.getElementById('tanggalSurat').value,
+        nomorAgenda: document.getElementById('nomorAgenda').value, tanggalTerima: document.getElementById('tanggalTerima').value,
+        tglTTD: document.getElementById('tglTTD').value, catatan: document.getElementById('catatan').value,
+        namaKepala: document.getElementById('namaKepala').value, nipKepala: document.getElementById('nipKepala').value,
+        ttd: localStorage.getItem('ttdKepala') || ttdData,
+        sifat: getChecked(['sifatUmum','sifatRahasia']),
+        urgensi: getChecked(['urgensiBiasa','urgensiPenting','urgensiSangatPenting','segera','amatSegera']),
+        tujuan: getChecked(['tujuanSekretaris','tujuanMutasiPromosi','tujuanPengadaan','tujuanPenilaianKinerja','tujuanPengembanganAparatur']),
+        instruksi: getChecked(['untukDipelajari','untukDanggapi','untukTindakLanjuti','untukKetahuiArsip','untukBicarakan']),
+        waktu: new Date().toISOString(),
+        file: fileSuratGlobal, fileName: fileNameGlobal
+    };
+}
+window.simpanDisposisi = function(){ const d=getFormData(); if(!d.suratDari||!d.perihal){ alert('Lengkapi Surat Dari & Perihal'); return;} localStorage.setItem('hasilDisposisi', JSON.stringify(d)); localStorage.setItem('namaKepalaBKPSDM', d.namaKepala); localStorage.setItem('nipKepalaBKPSDM', d.nipKepala); alert('Disposisi disimpan lokal!'); }
+
+window.kirimWA = async function(tujuanList, perihal){
+  const setting=JSON.parse(localStorage.getItem('settingWA')||'{}');
+  if(!setting.aktif||!setting.token) return 'WA nonaktif - atur di Pengaturan Admin';
+  const map=setting.nomor||{}; let hasil=[];
+  for(let t of tujuanList){
+    let no=''; if(t.includes('Sekretaris')) no=map['Sekretaris']; else if(t.includes('Mutasi')) no=map['Kabid Mutasi & Promosi']; else if(t.includes('Pengadaan')) no=map['Kabid Pengadaan, Pemberhentian & Informasi']; else if(t.includes('Kinerja')) no=map['Kabid Penilaian Kinerja Aparatur & Penghargaan']; else if(t.includes('Pengembangan')) no=map['Kabid Pengembangan Aparatur'];
+    if(!no){ hasil.push(t+': nomor kosong'); continue; }
+    let pesan=`🔔 DISPOSISI BARU BKPSDM MALTENG\n\nPerihal: ${perihal}\nTujuan: ${t}\nCatatan: ${document.getElementById('catatan').value||'-'}\n\nSilakan login E-Disposisi untuk lihat file.`;
+    try{ await fetch('https://api.fonnte.com/send',{method:'POST',headers:{'Authorization':setting.token},body:new URLSearchParams({target:no,message:pesan})}); hasil.push(t+': terkirim'); }catch(e){ hasil.push(t+': gagal'); }
+  }
+  return hasil.join(', ');
+}
+
+// ===== INI YANG DIPERBAIKI JADI ONLINE FIRESTORE (OPSI B) =====
+window.kirimKeBidang = async function(){
+    const d=getFormData(); if(d.tujuan.length===0){ alert('Pilih tujuan disposisi! (Private)'); return;} if(!d.suratDari){ alert('Lengkapi Surat Dari!'); return;}
+    const btn=document.getElementById('btnKirimBidang'); const txt=btn.innerHTML; btn.innerHTML='⏳ Mengirim Online ke Firestore...'; btn.disabled=true;
+
+    // cek ukuran file untuk Opsi B (Firestore limit ~1MB)
+    if(d.file && d.file.length > 900000){
+        if(!confirm('File agak besar ('+Math.round(d.file.length/1000)+'KB). Opsi B max ~900KB. Tetap kirim tanpa file? File bisa kamu kirim ulang versi kecil.')){ btn.innerHTML=txt; btn.disabled=false; return; }
+        d.file=null; fileSuratGlobal=null;
+    }
+
+    try{
+        // 1. Simpan tetap ke localStorage biar kompatibel dengan kode lama
+        let list=JSON.parse(localStorage.getItem('daftarDisposisiBidang')||'[]');
+        const dataSimpan={...d, id:Date.now(), noSurat:d.nomorSurat, pengirimSurat:d.suratDari, perihalSurat:d.perihal, nomorAgenda:d.nomorAgenda, ditujukanKepada:d.tujuan[0], status:'Baru', sudahDibaca:false, tglTTD:d.tglTTD, waktu:new Date().toLocaleString('id-ID')};
+        list.push(dataSimpan);
+        localStorage.setItem('daftarDisposisiBidang', JSON.stringify(list));
+        localStorage.setItem('hasilDisposisi', JSON.stringify(d));
+
+        // 2. Simpan ONLINE ke Firestore (OPSI B - tanpa Storage)
+        await addDoc(collection(db,'disposisiBidang'),{
+            suratDari:d.suratDari, perihal:d.perihal, noSurat:d.nomorSurat, tanggalSurat:d.tanggalSurat,
+            nomorAgenda:d.nomorAgenda, tanggalTerima:d.tanggalTerima, catatan:d.catatan,
+            tujuan:d.tujuan, instruksi:d.instruksi, sifat:d.sifat, urgensi:d.urgensi,
+            namaKepala:d.namaKepala, nipKepala:d.nipKepala, tglTTD:d.tglTTD, ttd:d.ttd,
+            file: d.file, fileName: d.fileName,
+            status:'Baru', sudahDibaca:false, createdAt: serverTimestamp()
+        });
+
+        const waRes=await kirimWA(d.tujuan, d.perihal);
+        alert('✅ ONLINE (OPSI B) terkirim ke Firestore!\nTujuan: '+d.tujuan.join(', ')+'\nWA: '+waRes+'\n\nKabid bisa buka dari HP masing-masing, tombol Lihat File bisa dibuka (tanpa butuh Storage).');
+        location.href='disposisi-bidang.html';
+    }catch(e){
+        console.error(e);
+        alert('Gagal kirim online: '+e.message+'\n\nPastikan Firestore Rules sudah Publish allow read,write. Jika error size, kecilkan PDF.');
+        btn.innerHTML=txt; btn.disabled=false;
+    }
+}
+
+window.resetForm = function(){ if(!confirm('Kosongkan semua?')) return; document.querySelectorAll('input[type=text], input[type=date], textarea').forEach(el=>{ if(el.id!=='namaKepala'&&el.id!=='nipKepala'&&el.id!=='tglTTD') el.value=''; }); document.querySelectorAll('input[type=checkbox]').forEach(el=>el.checked=false); hapusTTD(); }
+window.keluarSistem = function(){ if(confirm('Keluar?')){ localStorage.removeItem('peranPengguna'); localStorage.removeItem('usernameLogin'); location.href='login.html'; } }
+
+document.addEventListener('DOMContentLoaded', function(){
+    initCanvas();
+    document.getElementById('whoLogin').textContent=localStorage.getItem('usernameLogin')||'';
+    const nama = localStorage.getItem('namaKepalaBKPSDM'); if(nama) document.getElementById('namaKepala').value=nama;
+    const nip = localStorage.getItem('nipKepalaBKPSDM'); if(nip) document.getElementById('nipKepala').value=nip;
+    const dataSurat = localStorage.getItem('dataSuratDisposisi');
+    if(dataSurat){
+      try{
+        const s=JSON.parse(dataSurat);
+        document.getElementById('suratDari').value=s.pengirim||s.pengirimSurat||'';
+        document.getElementById('perihal').value=s.perihal||s.perihalSurat||'';
+        document.getElementById('nomorSurat').value=s.nomor||s.noSurat||'';
+        document.getElementById('tanggalSurat').value=s.tanggal||s.tanggalSurat||'';
+        document.getElementById('nomorAgenda').value=s.noAgenda||s.nomorAgenda||'';
+        document.getElementById('tanggalTerima').valueAsDate=new Date();
+        document.getElementById('tglTTD').value=new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long'});
+        if(s.file){ fileSuratGlobal=s.file; fileNameGlobal=s.fileName||''; document.getElementById('infoFile').innerHTML=`<i class="fas fa-paperclip me-1"></i> File terhubung: <b>${fileNameGlobal}</b> — akan ikut ONLINE (Opsi B)`; document.getElementById('infoFile').className='alert alert-success small py-2'; }
+        else { document.getElementById('infoFile').innerHTML=`File surat: tidak ada`; document.getElementById('infoFile').className='alert alert-secondary small py-2'; }
+      }catch(e){ document.getElementById('infoFile').textContent='Gagal baca data surat'; }
+    } else {
+      const arr=JSON.parse(localStorage.getItem('daftarSuratMasuk')||'[]');
+      if(arr.length){ const last=arr[arr.length-1]; fileSuratGlobal=last.file||null; fileNameGlobal=last.fileName||''; document.getElementById('infoFile').innerHTML=`File dari surat terakhir: <b>${fileNameGlobal||'ada'}</b>`; }
+      else { document.getElementById('infoFile').textContent='Belum ada surat masuk. Isi dulu di menu Surat Masuk.'; }
+      document.getElementById('tanggalTerima').valueAsDate=new Date();
+      document.getElementById('tglTTD').value=new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long'});
+    }
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

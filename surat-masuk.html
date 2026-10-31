@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surat Masuk — BKPSDM Maluku Tengah</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --biru-tua: #0d47a1; --biru: #1565c0; }
+        body { background: #f5f7fa; font-family: 'Segoe UI', sans-serif; }
+        .sidebar { background: linear-gradient(180deg, #0d47a1 0%, #1565c0 100%); min-height: 100vh; position: fixed; top: 0; left: 0; width: 260px; z-index: 100; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        .sidebar-brand { padding: 1.5rem 1rem; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-brand h5 { color: white; font-weight: 700; margin-bottom: 0; }
+        .sidebar-brand p { color: #bbdefb; font-size: 0.8rem; }
+        .sidebar-menu { list-style: none; padding: 1rem; margin: 0; }
+        .sidebar-menu li { margin: 0.4rem 0; }
+        .sidebar-menu a { display: flex; align-items: center; padding: 0.85rem 1rem; color: #e3f2fd; text-decoration: none; border-radius: 8px; transition: all 0.3s ease; }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background: rgba(255,255,255,0.15); color: white; }
+        .sidebar-menu a i { margin-right: 0.75rem; width: 20px; text-align: center; }
+        .main-content { margin-left: 260px; padding: 2rem; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 1.5rem; }
+        .card-header { background: var(--biru-tua); color: white; font-weight: 600; border-radius: 12px 12px 0 0 !important; }
+        .badge-belum { background: #d32f2f; }
+        .badge-sudah { background: #4caf50; }
+        .logo-placeholder { background: white; border-radius: 8px; padding: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; color: #0d47a1; font-size: 14px; border: 2px solid #e3f2fd; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-brand">
+  <img src="logo-bkpsdm.png" alt="Logo BKPSDM" style="width:75px;height:75px;object-fit:contain;margin-bottom:8px;filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));">
+  <h5>BKPSDM</h5><p>Kab. Maluku Tengah</p>
+  <div class="mt-2"><span id="whoLogin" class="badge bg-white text-primary" style="font-size:10px"></span></div>
+</div>
+    <ul class="sidebar-menu">
+        <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="surat-masuk.html" class="active"><i class="fas fa-envelope"></i> Surat Masuk</a></li>
+        <li><a href="disposisi-kepala.html"><i class="fas fa-file-signature"></i> Lembar Disposisi</a></li>
+        <li><a href="disposisi-bidang.html"><i class="fas fa-envelope-open-text"></i> Disposisi Masuk</a></li>
+        <li><a href="arsip.html"><i class="fas fa-archive"></i> Arsip Digital</a></li>
+        <li id="menuAdmin" style="display: none;"><a href="pengaturan-admin.html"><i class="fas fa-cog"></i> Pengaturan Admin</a></li>
+        <li><a href="#" onclick="keluarSistem()"><i class="fas fa-sign-out-alt"></i> Keluar</a></li>
+    </ul>
+</div>
+
+<div class="main-content">
+    <h4 class="mb-4"><i class="fas fa-envelope me-2 text-primary"></i> Pendaftaran Surat Masuk</h4>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="fas fa-plus-circle me-2"></i> Formulir Surat Masuk</h6>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Nomor Surat <span class="text-danger">*</span></label>
+                <input type="text" id="noSurat" class="form-control" placeholder="Masukkan nomor surat">
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Tanggal Surat <span class="text-danger">*</span></label>
+                    <input type="date" id="tanggalSurat" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Pengirim <span class="text-danger">*</span></label>
+                    <input type="text" id="pengirim" class="form-control" placeholder="Nama instansi/pengirim">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Perihal <span class="text-danger">*</span></label>
+                <textarea id="perihal" class="form-control" rows="2" placeholder="Perihal atau isi ringkas surat"></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Tautan Dokumen (Google Drive)</label>
+                <input type="url" id="tautanGDrive" class="form-control" placeholder="https://drive.google.com/file/d/xxxx/view">
+                <small class="text-muted"><i class="fas fa-info-circle me-1"></i> Unggah dokumen ke Google Drive → Salin tautannya → Tempel di sini</small>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-primary" onclick="simpanSuratMasuk()"><i class="fas fa-save me-2"></i> Simpan Surat</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="resetForm()"><i class="fas fa-redo me-2"></i> Kosongkan</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0"><i class="fas fa-list me-2"></i> Daftar Surat Masuk</h6>
+            <input type="text" id="cariSurat" class="form-control form-control-sm w-auto" placeholder="Cari surat..." onkeyup="renderDaftar()">
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>No</th>
+                            <th>No. Surat</th>
+                            <th>Tgl Surat</th>
+                            <th>Pengirim</th>
+                            <th>Perihal</th>
+                            <th>Dokumen</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodySurat">
+                        <tr><td colspan="8" class="text-center text-muted py-4">Belum ada surat masuk</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const peranPengguna = localStorage.getItem('peranPengguna') || '';
+if (peranPengguna === 'admin') document.getElementById('menuAdmin').style.display = 'block';
+
+function getList(){ return JSON.parse(localStorage.getItem('daftarSuratMasuk') || '[]'); }
+function setList(list){ localStorage.setItem('daftarSuratMasuk', JSON.stringify(list)); }
+
+function simpanSuratMasuk(){
+    const noSurat = document.getElementById('noSurat').value.trim();
+    const tanggalSurat = document.getElementById('tanggalSurat').value;
+    const pengirim = document.getElementById('pengirim').value.trim();
+    const perihal = document.getElementById('perihal').value.trim();
+    const tautanGDrive = document.getElementById('tautanGDrive').value.trim();
+    if(!noSurat || !tanggalSurat || !pengirim || !perihal){ alert('Lengkapi field bertanda * !'); return; }
+    let list = getList();
+    list.unshift({ id: Date.now(), noSurat, tanggalSurat, pengirim, perihal, tautanGDrive, noAgenda: 'AG-' + Date.now().toString().slice(-6), status: 'Belum Disposisi', dibuat: new Date().toISOString() });
+    setList(list);
+    resetForm();
+    renderDaftar();
+    alert('Surat berhasil disimpan!');
+}
+
+function renderDaftar(){
+    const tbody = document.getElementById('tbodySurat');
+    let list = getList();
+    const keyword = document.getElementById('cariSurat').value.toLowerCase();
+    if(keyword) list = list.filter(s => (s.noSurat + s.pengirim + s.perihal).toLowerCase().includes(keyword));
+    if(list.length === 0){ tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-4">Tidak ada data</td></tr>`; return; }
+    tbody.innerHTML = list.map((s,i) => `
+        <tr>
+            <td>${i+1}</td>
+            <td><strong>${s.noSurat}</strong><br><small class="text-muted">${s.noAgenda}</small></td>
+            <td>${s.tanggalSurat}</td>
+            <td>${s.pengirim}</td>
+            <td>${s.perihal}</td>
+            <td>${s.tautanGDrive ? `<a href="${s.tautanGDrive}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-external-link-alt"></i> Lihat</a>` : '<span class="text-muted">-</span>'}</td>
+            <td><span class="badge ${s.status === 'Sudah Disposisi' ? 'badge-sudah' : 'badge-belum'}">${s.status}</span></td>
+            <td>
+                <button class="btn btn-sm btn-success me-1" onclick="buatDisposisi(${s.id})" title="Buat Disposisi"><i class="fas fa-file-signature"></i></button>
+                <button class="btn btn-sm btn-danger" onclick="hapusSurat(${s.id})" title="Hapus"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function buatDisposisi(id){
+    const list = getList();
+    const surat = list.find(s => s.id === id);
+    if(!surat) return;
+    localStorage.setItem('dataSuratDisposisi', JSON.stringify({ pengirim: surat.pengirim, perihal: surat.perihal, nomor: surat.noSurat, tanggal: surat.tanggalSurat, noAgenda: surat.noAgenda, idSuratAsal: surat.id, tautan: surat.tautanGDrive }));
+    const updated = list.map(s => s.id === id ? {...s, status: 'Sudah Disposisi'} : s);
+    setList(updated);
+    window.location.href = 'disposisi-kepala.html';
+}
+
+function hapusSurat(id){
+    if(!confirm('Hapus surat ini?')) return;
+    let list = getList().filter(s => s.id !== id);
+    setList(list);
+    renderDaftar();
+}
+
+function resetForm(){
+    document.getElementById('noSurat').value = '';
+    document.getElementById('tanggalSurat').value = '';
+    document.getElementById('pengirim').value = '';
+    document.getElementById('perihal').value = '';
+    document.getElementById('tautanGDrive').value = '';
+}
+
+function keluarSistem(){
+    if(confirm('Keluar dari sistem?')){
+        localStorage.removeItem('peranPengguna');
+        window.location.href = 'login.html';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', renderDaftar);
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

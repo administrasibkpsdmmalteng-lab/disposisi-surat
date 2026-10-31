@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Disposisi Masuk — BKPSDM Maluku Tengah (ONLINE OPSI B)</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{--biru-tua:#0d47a1}
+body{background:#f5f7fa;font-family:'Segoe UI',sans-serif}
+.sidebar{background:linear-gradient(180deg,#0d47a1 0%,#1565c0 100%);min-height:100vh;position:fixed;top:0;left:0;width:260px;z-index:999}
+.sidebar-brand{padding:1.5rem 1rem;text-align:center;border-bottom:1px solid rgba(255,255,255,.1)}
+.sidebar-brand h5{color:#fff;font-weight:700;margin:0}
+.sidebar-brand p{color:#bbdefb;font-size:.8rem}
+.sidebar-menu{list-style:none;padding:1rem;margin:0}
+.sidebar-menu li{margin:.4rem 0}
+.sidebar-menu a{display:flex;align-items:center;padding:.85rem 1rem;color:#e3f2fd;text-decoration:none;border-radius:8px;transition:.2s}
+.sidebar-menu a:hover,.sidebar-menu a.active{background:rgba(255,255,255,.15);color:#fff}
+.sidebar-menu a i{margin-right:.75rem;width:20px;text-align:center}
+.main-content{margin-left:260px;padding:2rem}
+.card{border:none;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.info-box{background:#e3f2fd;border-left:4px solid #1565c0;padding:1rem;border-radius:4px;margin-bottom:1rem}
+.disposisi-mini{border:2px solid #333;background:#fff;max-width:800px;margin:0 auto}
+.badge-belum{background:#d32f2f}.badge-sudah{background:#4caf50}
+</style>
+</head>
+<body>
+<div class="sidebar">
+<div class="sidebar-brand">
+  <img src="logo-bkpsdm.png" alt="Logo BKPSDM" style="width:75px;height:75px;object-fit:contain;margin-bottom:8px;filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));">
+  <h5>BKPSDM</h5><p>Kab. Maluku Tengah</p>
+  <div class="mt-2"><span id="whoLogin" class="badge bg-white text-primary" style="font-size:10px"></span></div>
+</div>
+<ul class="sidebar-menu">
+<li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+<li><a href="surat-masuk.html"><i class="fas fa-envelope"></i> Surat Masuk</a></li>
+<li><a href="disposisi-kepala.html"><i class="fas fa-file-signature"></i> Disposisi Surat</a></li>
+<li><a href="disposisi-bidang.html" class="active"><i class="fas fa-envelope-open-text"></i> Disposisi Masuk</a></li>
+<li><a href="arsip.html"><i class="fas fa-archive"></i> Arsip Digital</a></li>
+<li><a href="#" onclick="keluarSistem()"><i class="fas fa-sign-out-alt"></i> Keluar</a></li>
+</ul>
+</div>
+<div class="main-content">
+<div class="d-flex justify-content-between align-items-center mb-4">
+<h4><i class="fas fa-envelope-open-text me-2 text-primary"></i> Disposisi Masuk ke Bidang (ONLINE)</h4>
+<button class="btn btn-outline-primary" onclick="tampilkanDisposisi()"><i class="fas fa-sync-alt me-1"></i> Segarkan</button>
+</div>
+<div class="info-box"><strong>Jumlah Disposisi: <span id="jumlahDisposisi">0</span></strong> <span class="ms-3" id="infoPrivasi"></span> <span class="ms-3 text-muted">— TTD Kepala: <strong>Sah Alim Latuconsina, S.STP.,M.Si</strong></span></div>
+<div class="card mb-3"><div class="card-body py-2"><select id="filterBidang" class="form-select" onchange="tampilkanDisposisi()"><option value="semua">— Semua Bidang —</option><option>Sekretaris</option><option>Kabid Mutasi & Promosi</option><option>Kabid Pengadaan, Pemberhentian & Informasi</option><option>Kabid Penilaian Kinerja Aparatur & Penghargaan</option><option>Kabid Pengembangan Aparatur</option></select></div></div>
+<div class="card"><div class="card-header"><h6 class="mb-0"><i class="fas fa-list me-2"></i> Daftar Disposisi Masuk</h6></div><div class="card-body p-0"><div class="table-responsive"><table class="table table-hover mb-0 align-middle"><thead class="table-light"><tr><th>No</th><th>No Surat</th><th>Perihal</th><th>Tujuan</th><th>Tgl</th><th>TTD</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="tabelDisposisi"></tbody></table></div></div></div>
+<div class="modal fade" id="modalDetail" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-scrollable"><div class="modal-content"><div class="modal-header bg-primary text-white"><h5 class="modal-title"><i class="fas fa-file-alt me-2"></i> Detail Disposisi</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body" id="isiModalDetail"></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button><button type="button" class="btn btn-warning" onclick="tandaiSudahDibaca()">Sudah Dibaca</button><button type="button" class="btn btn-success" onclick="arsipkan()">Arsipkan</button><button type="button" class="btn btn-outline-primary" onclick="cetakModal()"><i class="fas fa-print"></i> Cetak</button></div></div></div></div>
+</div>
+
+<script type="module">
+// ===== FIREBASE CONFIG GABUNG - OPSI B TANPA STORAGE =====
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, query, orderBy, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD5JJzznHpSzMyvocaBFu9QuyeA7OSRHT4",
+  authDomain: "bkpsdm-malteng.firebaseapp.com",
+  projectId: "bkpsdm-malteng",
+  storageBucket: "bkpsdm-malteng.firebasestorage.app",
+  messagingSenderId: "82335203567",
+  appId: "1:82335203567:web:80da48f1db741e9045db1a",
+  measurementId: "G-FLCGL08CTT"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let daftarDisposisi=[]; let windowFiltered=[]; let indeksTerpilih=null; let idxGlobalTerpilih=-1; let selectedDocId=null;
+
+// ===== SEKARANG AMBIL DARI FIRESTORE, BUKAN LOCALSTORAGE =====
+window.getSemuaData = async function(){
+  const q = query(collection(db,'disposisiBidang'), orderBy('createdAt','desc'));
+  const snap = await getDocs(q);
+  return snap.docs.map((docSnap,i)=>{
+    const d = docSnap.data();
+    return {
+      _idxAsli:i, 
+      idDocFirebase: docSnap.id,
+      id: docSnap.id,
+      noSurat: d.noSurat||d.nomorSurat||'-', 
+      perihalSurat: d.perihalSurat||d.perihal||'-',
+      pengirimSurat: d.pengirimSurat||d.suratDari||'-', 
+      ditujukanKepada: d.ditujukanKepada||(d.tujuan?d.tujuan[0]:'')||'-',
+      tujuanAll: d.tujuan||[d.ditujukanKepada], 
+      arahan: d.arahan||d.catatan||(Array.isArray(d.instruksi)?d.instruksi.join(', '):d.instruksi)||'-',
+      tanggalDisposisi: d.tanggalDisposisi||d.tanggalTerima||d.createdAt?.toDate?.().toLocaleString('id-ID')||'-', 
+      ttd: d.ttd||'',
+      namaKepala: d.namaKepala||'Sah Alim Latuconsina, S.STP.,M.Si',
+      nipKepala: d.nipKepala||'NIP. 198005151999121001',
+      sudahDibaca: d.sudahDibaca||false, 
+      raw: d, 
+      tglTTD: d.tglTTD||'', 
+      file: d.file||'', 
+      fileName: d.fileName||''
+    };
+  });
+}
+
+window.tampilkanDisposisi = async function(){
+  document.getElementById('tabelDisposisi').innerHTML=`<tr><td colspan="8" class="text-center py-3">⏳ Memuat dari Firestore...</td></tr>`;
+  const username=(localStorage.getItem('usernameLogin')||'').toLowerCase();
+  const namaLogin=localStorage.getItem('namaLogin')||username;
+  const mapping={
+    'sekretaris':['Sekretaris'],
+    'kabid_mutasi':['Kabid Mutasi & Promosi'],
+    'kabid_pengadaan':['Kabid Pengadaan, Pemberhentian & Informasi'],
+    'kabid_kinerja':['Kabid Penilaian Kinerja Aparatur & Penghargaan'],
+    'kabid_pengembangan':['Kabid Pengembangan Aparatur']
+  };
+  try{
+    daftarDisposisi = await getSemuaData();
+    let filter=document.getElementById('filterBidang').value;
+    let filtered=daftarDisposisi;
+    const tujuanSaya=mapping[username];
+    if(tujuanSaya){
+      filtered=daftarDisposisi.filter(d=> (d.tujuanAll||[]).some(t=> tujuanSaya.includes(t)) || tujuanSaya.some(ts=> (d.ditujukanKepada||'').includes(ts)));
+      document.getElementById('infoPrivasi').innerHTML=`<span class="badge bg-warning text-dark"><i class="fas fa-lock me-1"></i>Private: ${tujuanSaya.join(', ')} — ${namaLogin}</span>`;
+      document.getElementById('filterBidang').disabled=true;
+    } else {
+      document.getElementById('filterBidang').disabled=false;
+      if(filter!=='semua') filtered=daftarDisposisi.filter(d=> (d.ditujukanKepada||'').includes(filter) || (d.tujuanAll||[]).join(' ').includes(filter));
+      document.getElementById('infoPrivasi').innerHTML=`<span class="badge bg-success">Mode Admin: ${username||'admin'} — lihat semua (${daftarDisposisi.length})</span>`;
+    }
+    windowFiltered=filtered;
+    document.getElementById('jumlahDisposisi').textContent=filtered.length;
+    const tbody=document.getElementById('tabelDisposisi');
+    if(filtered.length===0){ tbody.innerHTML=`<tr><td colspan="8" class="text-center py-4 text-muted">Belum ada data disposisi untuk kamu<br><small>Pastikan Kepala sudah kirim ke bidang ini di menu Disposisi Kepala (versi ONLINE)</small></td></tr>`; return; }
+    tbody.innerHTML=filtered.map((d,i)=>`
+      <tr>
+       <td>${i+1}</td><td><strong>${d.noSurat}</strong></td>
+       <td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.perihalSurat}</td>
+       <td><span class="badge bg-info text-dark" style="font-size:10px">${(d.tujuanAll||[]).join(', ')}</span></td>
+       <td><small>${d.tanggalDisposisi}</small></td>
+       <td>${d.ttd?`<img src="${d.ttd}" style="width:60px;height:25px;object-fit:contain;border:1px solid #ddd">`:`<span class="text-muted">-</span>`}</td>
+       <td>${d.sudahDibaca?'<span class="badge badge-sudah">Sudah Dibaca</span>':'<span class="badge badge-belum">Belum Dibaca</span>'}</td>
+       <td><button class="btn btn-sm btn-primary" onclick="bukaDetail(${i})"><i class="fas fa-eye"></i> Lihat</button></td>
+      </tr>`).join('');
+  }catch(e){
+    console.error(e);
+    document.getElementById('tabelDisposisi').innerHTML=`<tr><td colspan="8" class="text-center py-4 text-danger">Gagal load Firestore: ${e.message}<br><small>Pastikan Rules Firestore sudah Publish allow read,write</small></td></tr>`;
+  }
+}
+
+window.bukaDetail = function(idxFiltered){
+ const d=windowFiltered[idxFiltered];
+ if(!d) return;
+ idxGlobalTerpilih=d._idxAsli;
+ indeksTerpilih=d.id;
+ selectedDocId=d.idDocFirebase;
+
+ let fileBtn='';
+ if(d.file){
+   if(d.file.startsWith('data:')){
+     // OPSI B: file base64 langsung dari Firestore
+     fileBtn=`<button onclick="bukaFileBase64('${d.idDocFirebase}')" class="btn btn-sm btn-outline-danger"><i class="fas fa-file-pdf me-1"></i> ${d.fileName||'Lihat File Surat'}</button>`;
+   } else if(d.file.startsWith('http')){
+     fileBtn=`<a href="${d.file}" target="_blank" class="btn btn-sm btn-outline-danger"><i class="fas fa-file-pdf me-1"></i> ${d.fileName||'Lihat File Surat'}</a>`;
+   } else {
+     fileBtn=`<span class="text-muted small">Format file tidak dikenal</span>`;
+   }
+ } else {
+   fileBtn=`<span class="text-muted small">Tidak ada file (surat lama)</span>`;
+ }
+
+ document.getElementById('isiModalDetail').innerHTML=`
+  <div class="disposisi-mini p-3" id="cetakArea">
+   <div class="text-center border-bottom border-dark pb-2 mb-3"><strong>PEMERINTAH KAB. MALUKU TENGAH - BKPSDM</strong><br><small>LEMBAR DISPOSISI (ONLINE OPSI B)</small><br><small style="font-size:10px">No Agenda: ${d.raw.nomorAgenda||'-'} | Sifat: ${(d.raw.sifat||[]).join(', ')} | Urgensi: ${(d.raw.urgensi||[]).join(', ')}</small></div>
+   <p><strong>Surat Dari:</strong> ${d.pengirimSurat}<br><strong>Perihal:</strong> ${d.perihalSurat}<br><strong>No Surat:</strong> ${d.noSurat} | <strong>Tgl:</strong> ${d.tanggalDisposisi}<br><strong>Tujuan:</strong> ${(d.tujuanAll||[]).join(', ')}<br><strong>Instruksi:</strong> ${(d.raw.instruksi||[]).join(', ')||'-'}<br><strong>Catatan:</strong><br><em>${d.arahan}</em></p>
+   <p><strong>File:</strong> ${fileBtn}</p>
+   <div class="text-end mt-4">
+    <p class="mb-0">Masohi, ${d.tglTTD||''} 2026<br>Kepala Badan,</p>
+    ${d.ttd?`<img src="${d.ttd}" style="width:200px;height:80px;object-fit:contain;">`:`<div style="height:80px"></div>`}
+    <p class="mb-0"><u><strong>${d.namaKepala}</strong></u></p>
+    <p style="font-size:12px">${d.nipKepala}</p>
+   </div>
+  </div>`;
+ new bootstrap.Modal(document.getElementById('modalDetail')).show();
+}
+
+window.bukaFileBase64 = function(idDoc){
+  const d = windowFiltered.find(x=> x.idDocFirebase===idDoc) || daftarDisposisi.find(x=> x.idDocFirebase===idDoc);
+  if(!d || !d.file) return alert('File tidak ada');
+  const w = window.open();
+  w.document.write(`<iframe src="${d.file}" style="width:100%;height:100vh;border:none"></iframe>`);
+}
+
+window.cetakModal = function(){ const area=document.getElementById('cetakArea').innerHTML; const w=window.open(''); w.document.write('<html><head><title>Cetak</title></head><body>'+area+'</body></html>'); w.document.close(); w.print(); }
+
+window.tandaiSudahDibaca = async function(){
+  if(!selectedDocId) return;
+  try{
+    await updateDoc(doc(db,'disposisiBidang',selectedDocId),{sudahDibaca:true, status:'Sudah Dibaca'});
+    tampilkanDisposisi();
+    bootstrap.Modal.getInstance(document.getElementById('modalDetail')).hide();
+  }catch(e){ alert('Gagal update: '+e.message); }
+}
+
+window.arsipkan = function(){
+ const d=windowFiltered.find(x=> x.id===indeksTerpilih);
+ if(!d) return;
+ let arsip=JSON.parse(localStorage.getItem('arsipDigital')||'[]');
+ arsip.push({...d.raw, diarsipkanPada:new Date().toISOString(), file:d.raw.file||d.file||''});
+ localStorage.setItem('arsipDigital',JSON.stringify(arsip));
+ alert('Diarsipkan ke Arsip Digital!');
+ tandaiSudahDibaca();
+}
+
+window.keluarSistem = function(){ if(confirm('Keluar?')){ localStorage.removeItem('peranPengguna'); localStorage.removeItem('usernameLogin'); location.href='login.html'; } }
+
+document.addEventListener('DOMContentLoaded',()=>{
+ if(!localStorage.getItem('peranPengguna')) location.href='login.html';
+ document.getElementById('whoLogin').textContent=localStorage.getItem('usernameLogin')||'admin';
+ tampilkanDisposisi();
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

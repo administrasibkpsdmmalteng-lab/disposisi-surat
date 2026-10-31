@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — BKPSDM Maluku Tengah</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+<style>
+:root{--biru-tua:#0d47a1;--biru:#1565c0}
+body{background:#f5f7fb;font-family:'Segoe UI',sans-serif}
+.sidebar{background:linear-gradient(180deg,#0d47a1 0%, #1976d2 100%);min-height:100vh;position:fixed;top:0;left:0;width:260px;z-index:100;box-shadow:4px 0 20px rgba(0,0,0,.1)}
+.sidebar-brand{padding:1.8rem 1rem;text-align:center;border-bottom:1px solid rgba(255,255,255,.12)}
+.sidebar-brand .logo{width:50px;height:50px;background:#fff;color:#0d47a1;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;margin:0 auto 10px;font-size:18px}
+.sidebar-brand h5{color:#fff;font-weight:700;margin:0}
+.sidebar-brand p{color:#bbdefb;font-size:.8rem;margin:0}
+.sidebar-menu{list-style:none;padding:1rem;margin:0}
+.sidebar-menu li{margin:.35rem 0}
+.sidebar-menu a{display:flex;align-items:center;padding:.9rem 1rem;color:#e3f2fd;text-decoration:none;border-radius:10px;transition:.3s}
+.sidebar-menu a:hover,.sidebar-menu a.active{background:rgba(255,255,255,.18);color:#fff;transform:translateX(4px)}
+.sidebar-menu a i{margin-right:.75rem;width:20px;text-align:center}
+.main-content{margin-left:260px;padding:2rem}
+.card{border:none;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,.06);transition:.3s}
+.card-hover:hover{transform:translateY(-6px);box-shadow:0 12px 28px rgba(0,0,0,.12);cursor:pointer}
+.stat-card{position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;right:-20px;top:-20px;width:100px;height:100px;background:rgba(255,255,255,.15);border-radius:50%}
+.stat-icon{width:58px;height:58px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px}
+.bg-gradient-primary{background:linear-gradient(135deg,#0d47a1,#42a5f5)}
+.bg-gradient-success{background:linear-gradient(135deg,#2e7d32,#66bb6a)}
+.bg-gradient-warning{background:linear-gradient(135deg,#ef6c00,#ffa726)}
+.bg-gradient-info{background:linear-gradient(135deg,#1565c0,#4fc3f7)}
+.quick-btn{border-radius:12px;padding:1rem;text-align:left;transition:.3s}
+.quick-btn:hover{transform:translateY(-3px)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-brand">
+  <img src="logo-bkpsdm.png" alt="Logo BKPSDM" style="width:75px;height:75px;object-fit:contain;margin-bottom:8px;filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));">
+  <h5>BKPSDM</h5><p>Kab. Maluku Tengah</p>
+  <div class="mt-2"><span id="whoLogin" class="badge bg-white text-primary" style="font-size:10px"></span></div>
+</div>
+<ul class="sidebar-menu">
+<li><a href="dashboard.html" class="active"><i class="fas fa-th-large"></i> Dashboard</a></li>
+<li><a href="surat-masuk.html"><i class="fas fa-envelope"></i> Surat Masuk</a></li>
+<li><a href="disposisi-kepala.html"><i class="fas fa-file-signature"></i> Disposisi Kepala</a></li>
+<li><a href="disposisi-bidang.html"><i class="fas fa-envelope-open-text"></i> Disposisi Bidang</a></li>
+<li><a href="arsip.html"><i class="fas fa-archive"></i> Arsip Digital</a></li>
+<li><a href="pengaturan-admin.html"><i class="fas fa-cog"></i> Pengaturan Admin</a></li>
+<li><a href="#" onclick="keluar()"><i class="fas fa-sign-out-alt"></i> Keluar</a></li>
+</ul>
+</div>
+
+<div class="main-content">
+<!-- HEADER + BELL NOTIFIKASI -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+<div><h4 class="mb-0 fw-bold">Dashboard E-Disposisi</h4><small class="text-muted">Kepala: <strong>Sah Alim Latuconsina, S.STP.,M.Si</strong></small></div>
+<div class="d-flex align-items-center gap-2">
+<div class="dropdown">
+<button class="btn bg-white shadow-sm position-relative rounded-circle" style="width:48px;height:48px" data-bs-toggle="dropdown"><i class="fas fa-bell fs-5"></i><span id="notifBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display:none">0</span></button>
+<ul class="dropdown-menu dropdown-menu-end shadow border-0 p-0" style="width:380px;max-height:420px;overflow-y:auto;border-radius:12px" id="notifDropdown"><li class="p-3 text-center text-muted small">Memuat...</li></ul>
+</div>
+<button class="btn bg-white shadow-sm rounded-circle" style="width:48px;height:48px" onclick="location.href='pengaturan-admin.html'"><i class="fas fa-cog"></i></button>
+<div><span class="badge bg-primary bg-opacity-10 text-primary p-2"><i class="fas fa-calendar me-1"></i> <span id="tglHariIni"></span></span></div>
+</div>
+</div>
+
+<!-- 4 CARD KLIKABLE -->
+<div class="row g-3 mb-4">
+<div class="col-md-3"><div class="card stat-card card-hover p-3 bg-gradient-primary text-white" onclick="location.href='surat-masuk.html'"><div class="d-flex justify-content-between align-items-center"><div><p class="mb-1 opacity-75 small">Surat Masuk</p><h2 class="mb-0 fw-bold" id="jmlSurat">0</h2><small class="opacity-75">Klik untuk kelola →</small></div><div class="stat-icon bg-white bg-opacity-25"><i class="fas fa-envelope"></i></div></div></div></div>
+<div class="col-md-3"><div class="card stat-card card-hover p-3 bg-gradient-warning text-white" onclick="location.href='disposisi-kepala.html'"><div class="d-flex justify-content-between align-items-center"><div><p class="mb-1 opacity-75 small">Disposisi Kepala</p><h2 class="mb-0 fw-bold" id="jmlKepala">0</h2><small class="opacity-75">Buat disposisi →</small></div><div class="stat-icon bg-white bg-opacity-25"><i class="fas fa-file-signature"></i></div></div></div></div>
+<div class="col-md-3"><div class="card stat-card card-hover p-3 bg-gradient-info text-white" onclick="location.href='disposisi-bidang.html'"><div class="d-flex justify-content-between align-items-center"><div><p class="mb-1 opacity-75 small">Disposisi Bidang</p><h2 class="mb-0 fw-bold" id="jmlBidang">0</h2><small class="opacity-75">Lihat tugas →</small></div><div class="stat-icon bg-white bg-opacity-25"><i class="fas fa-envelope-open-text"></i></div></div></div></div>
+<div class="col-md-3"><div class="card stat-card card-hover p-3 bg-gradient-success text-white" onclick="location.href='arsip.html'"><div class="d-flex justify-content-between align-items-center"><div><p class="mb-1 opacity-75 small">Arsip Digital</p><h2 class="mb-0 fw-bold" id="jmlArsip">0</h2><small class="opacity-75">Lihat arsip →</small></div><div class="stat-icon bg-white bg-opacity-25"><i class="fas fa-archive"></i></div></div></div></div>
+</div>
+
+<div class="row g-3">
+<div class="col-lg-8">
+<div class="card p-4 mb-3"><div class="d-flex justify-content-between align-items-center mb-3"><h6 class="mb-0 fw-bold"><i class="fas fa-chart-line me-2 text-primary"></i> 5 Surat Terbaru</h6><a href="surat-masuk.html" class="btn btn-sm btn-outline-primary">Lihat Semua</a></div><div class="table-responsive"><table class="table table-hover align-middle"><thead class="table-light"><tr><th>No Surat</th><th>Pengirim</th><th>Perihal</th><th>Status</th></tr></thead><tbody id="tbodyRecent"></tbody></table></div></div>
+<div class="card p-4"><h6 class="fw-bold mb-3"><i class="fas fa-tasks me-2 text-warning"></i> Progres Disposisi</h6><div class="mb-2 d-flex justify-content-between"><small>Belum Dibaca</small><small id="persenBelum">0%</small></div><div class="progress mb-3" style="height:10px"><div id="barBelum" class="progress-bar bg-danger" style="width:0%"></div></div><div class="mb-2 d-flex justify-content-between"><small>Sudah Dibaca / Selesai</small><small id="persenSudah">0%</small></div><div class="progress" style="height:10px"><div id="barSudah" class="progress-bar bg-success" style="width:0%"></div></div></div>
+</div>
+<div class="col-lg-4">
+<div class="card p-4 mb-3"><h6 class="fw-bold"><i class="fas fa-bolt me-2 text-primary"></i> Aksi Cepat</h6>
+<button class="btn btn-primary quick-btn w-100 mb-2" onclick="location.href='surat-masuk.html'"><i class="fas fa-plus me-2"></i> Input Surat Masuk Baru</button>
+<button class="btn btn-warning quick-btn w-100 mb-2 text-white" onclick="location.href='disposisi-kepala.html'"><i class="fas fa-pen me-2"></i> Buat Lembar Disposisi</button>
+<button class="btn btn-info quick-btn w-100 mb-2 text-white" onclick="location.href='disposisi-bidang.html'"><i class="fas fa-eye me-2"></i> Cek Disposisi Masuk</button>
+<button class="btn btn-success quick-btn w-100" onclick="location.href='arsip.html'"><i class="fas fa-archive me-2"></i> Buka Arsip Digital</button>
+</div>
+<div class="card p-4"><h6 class="fw-bold"><i class="fas fa-user-tie me-2"></i> Pimpinan</h6><div class="d-flex align-items-center"><img src="https://ui-avatars.com/api/?name=Sah+Alim+Latuconsina&background=0d47a1&color=fff" class="rounded-circle me-3" width="55"><div><strong>Sah Alim Latuconsina, S.STP.,M.Si</strong><br><small class="text-muted">Kepala BKPSDM Maluku Tengah</small><br><span id="ttdPreview"></span></div></div><hr><small class="text-muted"><i class="fas fa-shield-alt me-1"></i> Sistem E-Disposisi v2.1 + Notifikasi WA</small></div>
+</div>
+</div>
+</div>
+
+<!-- CONTAINER POPUP - WAJIB ADA DI BAWAH -->
+<div id="toastContainer" style="position:fixed;bottom:20px;right:20px;z-index:99999"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ===== LOGIKA DASHBOARD + NOTIFIKASI LENGKAP =====
+function keluar(){ if(confirm('Keluar?')){ localStorage.removeItem('peranPengguna'); location.href='login.html'; } }
+
+let lastCount = parseInt(localStorage.getItem('lastDisposisiCount')||'0');
+const audioNotif = new Audio('https://cdn.pixabay.com/audio/2022/03/15/audio_58d3d8e386.mp3'); audioNotif.volume=0.6;
+
+function getAllDisposisi(){ const a=JSON.parse(localStorage.getItem('daftarDisposisiBidang')||'[]'); const b=JSON.parse(localStorage.getItem('disposisiMasuk')||'[]'); return [...a,...b]; }
+
+function cekNotifikasiBaru(){
+  const total=getAllDisposisi().length; const baru=total-lastCount;
+  const badge=document.getElementById('notifBadge');
+  if(badge){ if(total>0){ badge.textContent=baru>0?baru:total; badge.style.display='inline-block'; badge.className='position-absolute top-0 start-100 translate-middle badge rounded-pill '+(baru>0?'bg-danger animate__animated animate__bounce':'bg-secondary'); } else badge.style.display='none'; }
+  if(baru>0 && total>lastCount){
+    const latest=getAllDisposisi().slice(-1)[0];
+    const tujuan=(latest.tujuan||[latest.ditujukanKepada||'Bidang']).join(', ');
+    tampilkanToast('📩 Disposisi Baru!', `<b>Dari:</b> ${latest.suratDari||latest.pengirimSurat||'Kepala'}<br><b>Perihal:</b> ${(latest.perihal||latest.perihalSurat||'').substring(0,60)}<br><b>Tujuan:</b> ${tujuan}`, latest.ttd||localStorage.getItem('ttdKepala')||'');
+    try{ audioNotif.play(); }catch(e){} if(navigator.vibrate) navigator.vibrate([200,100,200]);
+    let notifs=JSON.parse(localStorage.getItem('notifikasiDisposisi')||'[]'); notifs.unshift({id:Date.now(), judul:'Disposisi Baru', dari:latest.suratDari||'Kepala', perihal:latest.perihal||latest.perihalSurat||'-', tujuan:tujuan, waktu:new Date().toLocaleString('id-ID'), dibaca:false}); localStorage.setItem('notifikasiDisposisi', JSON.stringify(notifs.slice(0,30)));
+    // WA Gateway otomatis
+    if(window.kirimWAOtomatis) kirimWAOtomatis(latest);
+  }
+  localStorage.setItem('lastDisposisiCount', total); lastCount=total;
+}
+function tampilkanToast(judul, isi, ttd){
+  const container=document.getElementById('toastContainer'); if(!container) return; const id='toast-'+Date.now(); const nama=localStorage.getItem('namaKepalaBKPSDM')||'Sah Alim Latuconsina, S.STP.,M.Si';
+  container.insertAdjacentHTML('beforeend', `<div id="${id}" class="toast show bg-white border-start border-4 border-primary shadow-lg mb-3" style="min-width:380px;border-radius:12px;animation:slideIn .4s ease"><div class="d-flex"><div class="toast-body p-3"><div class="d-flex justify-content-between"><strong class="text-primary"><i class="fas fa-bell me-2"></i> ${judul}</strong><small class="text-muted">${new Date().toLocaleTimeString('id-ID')}</small></div><div class="small mt-2" style="line-height:1.5">${isi}</div><div class="d-flex align-items-center mt-2">${ttd?`<img src="${ttd}" style="height:32px;background:#fff;padding:2px;border:1px solid #eee;border-radius:4px" class="me-2">`:''}<small><b>${nama}</b></small></div><div class="mt-3"><button class="btn btn-primary btn-sm" onclick="location.href='disposisi-bidang.html'">Buka</button> <button class="btn btn-outline-secondary btn-sm" onclick="document.getElementById('${id}').remove()">Nanti</button></div></div><button type="button" class="btn-close me-2 mt-2" onclick="document.getElementById('${id}').remove()"></button></div></div>`);
+  setTimeout(()=>{ document.getElementById(id)?.remove(); }, 10000);
+}
+function renderDropdownNotif(){ const list=JSON.parse(localStorage.getItem('notifikasiDisposisi')||'[]'); const drop=document.getElementById('notifDropdown'); if(!drop) return; if(list.length===0){ drop.innerHTML='<li class="p-3 text-center text-muted small">🔔 Belum ada notifikasi<br><small>Akan muncul saat Kepala kirim disposisi</small></li>'; return; } drop.innerHTML=list.map(n=>`<li><a class="dropdown-item py-2 ${!n.dibaca?'bg-light fw-bold':''}" href="disposisi-bidang.html" style="white-space:normal"><div class="d-flex"><div class="me-2"><i class="fas fa-envelope-open-text text-primary"></i></div><div><div class="small">${n.perihal.substring(0,45)}...</div><small class="text-muted">Dari: ${n.dari} • ${n.waktu}</small><br><span class="badge bg-info bg-opacity-10 text-info" style="font-size:10px">${n.tujuan}</span></div></div></a></li>`).join('')+`<li><hr class="dropdown-divider"></li><li class="d-flex justify-content-between px-3 py-1"><a href="#" onclick="localStorage.removeItem('notifikasiDisposisi');renderDropdownNotif();document.getElementById('notifBadge').style.display='none'" class="small text-danger">Hapus Semua</a><a href="disposisi-bidang.html" class="small text-primary">Lihat Semua</a></li>`; }
+
+// WA GATEWAY MINI (sama seperti file wa-gateway.js)
+function getWASettings(){ return JSON.parse(localStorage.getItem('waSettings')||'{"provider":"fonnte","token":"","aktif":false,"nomorBidang":{}}'); }
+async function kirimWAOtomatis(disposisi){
+  const settings=getWASettings(); if(!settings.aktif||!settings.token) return;
+  const tujuanList=disposisi.tujuan||[disposisi.ditujukanKepada]||[]; const namaKepala=localStorage.getItem('namaKepalaBKPSDM')||'Sah Alim Latuconsina, S.STP.,M.Si';
+  const pesan=`🔔 *DISPOSISI BARU - BKPSDM MALUKU TENGAH*\n\nDari: ${disposisi.suratDari||disposisi.pengirimSurat||'Kepala'}\nNo: ${disposisi.nomorSurat||disposisi.noSurat||'-'}\nPerihal: ${disposisi.perihal||disposisi.perihalSurat||'-'}\nCatatan: ${disposisi.catatan||'-'}\nTujuan: ${tujuanList.join(', ')}\n\nTTD: ${namaKepala}\nWaktu: ${new Date().toLocaleString('id-ID')}`;
+  for(const tujuan of tujuanList){ const nomor=settings.nomorBidang[tujuan]; if(!nomor) continue; try{ let res; if(settings.provider==='fonnte'){ res=await fetch('https://api.fonnte.com/send',{method:'POST',headers:{'Authorization':settings.token,'Content-Type':'application/json'},body:JSON.stringify({target:nomor,message:pesan,countryCode:'62'})}); } console.log('WA ke '+tujuan, await res?.text()); const container=document.getElementById('toastContainer'); if(container){ const id='wa-'+Date.now(); container.insertAdjacentHTML('beforeend', `<div id="${id}" class="toast show bg-success text-white border-0 mb-2" style="min-width:340px"><div class="d-flex"><div class="toast-body"><strong><i class="fab fa-whatsapp me-2"></i> WA Terkirim!</strong><br><small>Ke ${tujuan} (${nomor})</small></div><button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="document.getElementById('${id}').remove()"></button></div></div>`); setTimeout(()=>{document.getElementById(id)?.remove()},6000); } }catch(e){ console.error(e); } }
+}
+
+// INIT
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('tglHariIni').textContent=new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const surat=JSON.parse(localStorage.getItem('daftarSuratMasuk')||'[]'); const dispA=JSON.parse(localStorage.getItem('daftarDisposisiBidang')||'[]'); const dispB=JSON.parse(localStorage.getItem('disposisiMasuk')||'[]'); const dispAll=[...dispA,...dispB]; const arsip=JSON.parse(localStorage.getItem('arsipDigital')||'[]'); const ttd=localStorage.getItem('ttdKepala');
+  document.getElementById('jmlSurat').textContent=surat.length; document.getElementById('jmlKepala').textContent=dispAll.length; document.getElementById('jmlBidang').textContent=dispA.length||dispAll.length; document.getElementById('jmlArsip').textContent=arsip.length;
+  const belum=dispAll.filter(d=> !d.sudahDibaca && d.status!=='Sudah Dibaca').length; const sudah=dispAll.length-belum; const persenBelum=dispAll.length?Math.round(belum/dispAll.length*100):0; const persenSudah=100-persenBelum;
+  document.getElementById('persenBelum').textContent=persenBelum+'% ('+belum+')'; document.getElementById('persenSudah').textContent=persenSudah+'% ('+sudah+')'; document.getElementById('barBelum').style.width=persenBelum+'%'; document.getElementById('barSudah').style.width=persenSudah+'%';
+  document.getElementById('tbodyRecent').innerHTML=surat.slice(0,5).map(s=>`<tr style="cursor:pointer" onclick="location.href='surat-masuk.html'"><td><strong>${s.noSurat}</strong></td><td>${s.pengirim}</td><td>${s.perihal.substring(0,25)}...</td><td><span class="badge ${s.status==='Sudah Disposisi'?'bg-success':'bg-danger'}">${s.status}</span></td></tr>`).join('') || '<tr><td colspan="4" class="text-center text-muted">Belum ada surat</td></tr>';
+  if(ttd) document.getElementById('ttdPreview').innerHTML=`<img src="${ttd}" style="height:30px;margin-top:5px;border:1px solid #eee">`;
+  cekNotifikasiBaru(); renderDropdownNotif(); setInterval(cekNotifikasiBaru,3000); setInterval(renderDropdownNotif,5000);
+});
+</script>
+</body>
+</html>
